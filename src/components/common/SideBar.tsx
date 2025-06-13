@@ -56,7 +56,6 @@ const SideBar = ({
             key={index}
             to={item.path}
             style={({ isActive }) => {
-              console.log("選択されたメニューは", item.text, isActive);
               return { ...baseLinkStyle, ...(isActive ? activeLinkStyle : {}) };
             }}
           >
