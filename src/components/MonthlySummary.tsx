@@ -3,9 +3,9 @@ import React from "react";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import { theme } from "../../theme/theme";
-import { Transaction } from "../../types";
-import { financeCalculations } from "../../utils/financeCalculations";
+import { theme } from "../theme/theme";
+import { Transaction } from "../types";
+import { financeCalculations } from "../utils/financeCalculations";
 
 interface MonthlySummaryProps {
   monthlyTransactions: Transaction[];
