@@ -6,14 +6,25 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import SideBar from "../common/SideBar";
+import { Avatar, Button, CSSProperties } from "@mui/material";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase";
 
 const drawerWidth = 240;
 
 export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [user] = useAuthState(auth);
+  const navigate = useNavigate();
+
+  const baseLinkStyle: CSSProperties = {
+    textDecoration: "none",
+    color: "inherit",
+    display: "block",
+  };
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -27,6 +38,15 @@ export default function AppLayout() {
   const handleDrawerToggle = () => {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("ログアウトに失敗しました", error);
     }
   };
 
@@ -57,9 +77,24 @@ export default function AppLayout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            収支管理アプリ
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1, textAlign: "left" }}
+          >
+            Finance Note
           </Typography>
+
+          {user ? (
+            <MemberModeHeader
+              name={user.displayName}
+              photoPath={user.photoURL}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <GuestModeHeader />
+          )}
         </Toolbar>
       </AppBar>
 
@@ -84,5 +119,57 @@ export default function AppLayout() {
         <Outlet />
       </Box>
     </Box>
+  );
+}
+
+function GuestModeHeader() {
+  return (
+    <>
+      {/* 名前 */}
+      <Typography variant="subtitle1">ゲスト さん</Typography>
+      {/* ログインボタン */}
+      <Button
+        component={Link}
+        to="/login"
+        color={"warning"}
+        variant="contained"
+        sx={{ ml: 1 }}
+      >
+        ログイン
+      </Button>
+    </>
+  );
+}
+
+interface MemberModeHeaderProps {
+  name: string | null;
+  photoPath: string | null;
+  onLogout: () => Promise<void>;
+}
+
+function MemberModeHeader({
+  name,
+  photoPath,
+  onLogout,
+}: MemberModeHeaderProps) {
+  return (
+    <>
+      {/* 写真 */}
+      {photoPath && (
+        <Avatar alt="Google Photo" src={photoPath} sx={{ mr: 1 }} />
+      )}
+      {/* ユーザー名 */}
+      {name && <Typography variant="subtitle1">{name} さん</Typography>}
+
+      {/* ログアウトボタン */}
+      <Button
+        color={"info"}
+        variant="contained"
+        sx={{ ml: 1 }}
+        onClick={onLogout}
+      >
+        ログアウト
+      </Button>
+    </>
   );
 }
