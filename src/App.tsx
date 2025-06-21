@@ -21,6 +21,7 @@ import { db } from "./firebase";
 import { format } from "date-fns";
 import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
+import Login from "./pages/Login";
 
 function App() {
   function isFireStoreError(
@@ -178,6 +179,7 @@ function App() {
                 />
               }
             />
+            <Route path="/login" element={<Login />} />
             <Route path="*" element={<NoMatch />} />
           </Route>
         </Routes>
