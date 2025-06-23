@@ -17,11 +17,12 @@ import {
   getDocs,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { auth, db } from "./firebase";
 import { format } from "date-fns";
 import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
 import Login from "./pages/Login";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 function App() {
   function isFireStoreError(
@@ -34,11 +35,19 @@ function App() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
 
+  const [user, loading, error] = useAuthState(auth);
+  const uid = user ? user.uid : "guest";
+
+  console.log("現在のUID", uid);
+
   // firestoreからデータ取得
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "Transactions"));
+        const querySnapshot = await getDocs(
+          collection(db, "users", uid, "Transactions")
+        );
+        // const querySnapshot = await getDocs(collection(db, "Transactions"));
 
         const transactionsData = querySnapshot.docs.map((doc) => {
           return {
@@ -60,7 +69,7 @@ function App() {
       }
     };
     fetchTransactions();
-  }, []);
+  }, [uid]);
 
   const monthlyTransactions = transactions.filter((transaction) => {
     return transaction.date.startsWith(formatMonth(currentMonth));
@@ -72,7 +81,10 @@ function App() {
     try {
       // fireStoreにデータを保存
       // Add a new document with a generated id.
-      const docRef = await addDoc(collection(db, "Transactions"), transaction);
+      const docRef = await addDoc(
+        collection(db, "users", uid, "Transactions"),
+        transaction
+      );
       console.log("Document written with ID: ", docRef.id);
 
       const newTransaction = {
@@ -94,6 +106,7 @@ function App() {
     }
   };
 
+  // 取引を削除する処理
   const handleDeleteTransaction = async (
     transactionIds: string | readonly string[]
   ) => {
@@ -104,7 +117,7 @@ function App() {
 
       for (const id of idsToDelete) {
         // firestoreのデータ削除
-        await deleteDoc(doc(db, "Transactions", id));
+        await deleteDoc(doc(db, "users", uid, "Transactions", id));
       }
 
       const filteredTransactions = transactions.filter(
@@ -129,7 +142,7 @@ function App() {
   ) => {
     try {
       // firestoreのデータ更新
-      const docRef = doc(db, "Transactions", transactionId);
+      const docRef = doc(db, "users", uid, "Transactions", transactionId);
       // Set the "capital" field of the city 'DC'
       await updateDoc(docRef, transaction);
 
