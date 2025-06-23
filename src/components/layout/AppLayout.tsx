@@ -11,6 +11,7 @@ import SideBar from "../common/SideBar";
 import { Avatar, Button, CSSProperties } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
+import { signOut } from "firebase/auth";
 
 const drawerWidth = 240;
 
@@ -43,7 +44,9 @@ export default function AppLayout() {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      // ① Firebase Authenticationからログアウト
+      await signOut(auth);
+      // ②  Loginページへ遷移
       navigate("/login");
     } catch (error) {
       console.error("ログアウトに失敗しました", error);
