@@ -12,6 +12,7 @@ import { Avatar, Button, CSSProperties } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
+import { useFlashMessage } from "../../contexts/FlashMessageContext";
 
 const drawerWidth = 240;
 
@@ -20,6 +21,7 @@ export default function AppLayout() {
   const [isClosing, setIsClosing] = React.useState(false);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
+  const { showFlashMessage } = useFlashMessage();
 
   const baseLinkStyle: CSSProperties = {
     textDecoration: "none",
@@ -46,10 +48,14 @@ export default function AppLayout() {
     try {
       // ① Firebase Authenticationからログアウト
       await signOut(auth);
+
+      showFlashMessage("ログアウトしました", "success");
+
       // ②  Loginページへ遷移
       navigate("/login");
     } catch (error) {
       console.error("ログアウトに失敗しました", error);
+      showFlashMessage("ログアウトに失敗しました", "error");
     }
   };
 
