@@ -23,6 +23,7 @@ import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
 import Login from "./pages/Login";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { FlashMessageProvider } from "./contexts/FlashMessageContext";
 
 function App() {
   function isFireStoreError(
@@ -164,39 +165,41 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<AppLayout />}>
-            <Route
-              index
-              element={
-                <Home
-                  monthlyTransactions={monthlyTransactions}
-                  setCurrentMonth={setCurrentMonth}
-                  onSaveTransaction={handleSaveTransaction}
-                  onDeleteTransaction={handleDeleteTransaction}
-                  onUpdateTransaction={handleUpdateTransaction}
-                />
-              }
-            />
-            <Route
-              path="/report"
-              element={
-                <Report
-                  currentMonth={currentMonth}
-                  setCurrentMonth={setCurrentMonth}
-                  monthlyTransactions={monthlyTransactions}
-                  isLoading={isLoading}
-                  onDeleteTransaction={handleDeleteTransaction}
-                />
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<NoMatch />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <FlashMessageProvider>
+        <CssBaseline />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<AppLayout />}>
+              <Route
+                index
+                element={
+                  <Home
+                    monthlyTransactions={monthlyTransactions}
+                    setCurrentMonth={setCurrentMonth}
+                    onSaveTransaction={handleSaveTransaction}
+                    onDeleteTransaction={handleDeleteTransaction}
+                    onUpdateTransaction={handleUpdateTransaction}
+                  />
+                }
+              />
+              <Route
+                path="/report"
+                element={
+                  <Report
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
+                    monthlyTransactions={monthlyTransactions}
+                    isLoading={isLoading}
+                    onDeleteTransaction={handleDeleteTransaction}
+                  />
+                }
+              />
+              <Route path="/login" element={<Login />} />
+              <Route path="*" element={<NoMatch />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </FlashMessageProvider>
     </ThemeProvider>
   );
 }

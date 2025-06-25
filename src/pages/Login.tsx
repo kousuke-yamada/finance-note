@@ -15,6 +15,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import { useFlashMessage } from "../contexts/FlashMessageContext";
 
 const Login = () => {
   // const [user] = useAuthState(auth);
@@ -52,6 +53,7 @@ interface UserData {
 // ログインボタン
 function SignInButton() {
   const navigate = useNavigate();
+  const { showFlashMessage } = useFlashMessage();
 
   // Googleログイン処理
   const handleGoogleLogin = async (): Promise<void> => {
@@ -66,10 +68,13 @@ function SignInButton() {
       await handleUserData(loggedInUser);
       console.log("②まで完了", loggedInUser.uid);
 
+      showFlashMessage("ログインに成功しました", "success");
+
       // ③ Homeページへ遷移
       navigate("/");
     } catch (error) {
       console.error("ログイン失敗", error);
+      showFlashMessage("ログインに失敗しました", "error");
     } finally {
     }
   };
