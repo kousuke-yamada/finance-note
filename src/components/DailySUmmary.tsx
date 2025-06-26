@@ -7,16 +7,18 @@ import { formatCurrency } from "../utils/formatting";
 
 interface DailySummaryProps {
   dailyTransactions: Transaction[];
+  coloums: number;
 }
 
-const DailySummary = ({ dailyTransactions }: DailySummaryProps) => {
+const DailySummary = ({ dailyTransactions, coloums }: DailySummaryProps) => {
   const { income, expense, balance } = financeCalculations(dailyTransactions);
+  const isThreeColumsLayout = coloums === 3;
 
   return (
     <Box>
       <Grid container spacing={2}>
         {/* 収入 */}
-        <Grid size={{ xs: 6 }} display={"flex"}>
+        <Grid size={{ xs: isThreeColumsLayout ? 4 : 6 }} display={"flex"}>
           <Card
             sx={{ bgcolor: (theme) => theme.palette.grey[100], flexGrow: 1 }}
           >
@@ -38,7 +40,7 @@ const DailySummary = ({ dailyTransactions }: DailySummaryProps) => {
           </Card>
         </Grid>
         {/* 支出 */}
-        <Grid size={{ xs: 6 }} display={"flex"}>
+        <Grid size={{ xs: isThreeColumsLayout ? 4 : 6 }} display={"flex"}>
           <Card
             sx={{ bgcolor: (theme) => theme.palette.grey[100], flexGrow: 1 }}
           >
@@ -60,7 +62,7 @@ const DailySummary = ({ dailyTransactions }: DailySummaryProps) => {
           </Card>
         </Grid>
         {/* 残高 */}
-        <Grid size={{ xs: 12 }} display={"flex"}>
+        <Grid size={{ xs: isThreeColumsLayout ? 4 : 12 }} display={"flex"}>
           <Card
             sx={{ bgcolor: (theme) => theme.palette.grey[100], flexGrow: 1 }}
           >
