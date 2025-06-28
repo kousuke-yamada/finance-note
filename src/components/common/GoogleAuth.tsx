@@ -1,5 +1,4 @@
 import { Button, Typography } from "@mui/material";
-import React from "react";
 import { getAuthErrorMessage, userGoogleLogin } from "../../utils/auth";
 import { useFlashMessage } from "../../contexts/FlashMessageContext";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +12,6 @@ const GoogleAuth = () => {
   const handleGoogleAuth = async () => {
     await userGoogleLogin()
       .then(() => {
-        console.log("Google認証でログインしました。");
         showFlashMessage("ログインしました", "success");
 
         // Homeページへ遷移

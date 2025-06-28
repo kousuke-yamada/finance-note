@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import SideBar from "../common/SideBar";
 import { Avatar, Button, CSSProperties } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -22,12 +22,6 @@ export default function AppLayout() {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const { showFlashMessage } = useFlashMessage();
-
-  const baseLinkStyle: CSSProperties = {
-    textDecoration: "none",
-    color: "inherit",
-    display: "block",
-  };
 
   const handleDrawerClose = () => {
     setIsClosing(true);

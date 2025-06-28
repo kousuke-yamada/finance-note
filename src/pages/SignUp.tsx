@@ -6,12 +6,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { auth, FirebaseAuthErrorCode } from "../firebase";
+import { FirebaseAuthErrorCode } from "../firebase";
 import { userSignUpSchema, SignUpSchema } from "../validations/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { getAuthErrorMessage, userEmailSignUp } from "../utils/auth";
 import { useFlashMessage } from "../contexts/FlashMessageContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -40,7 +38,6 @@ const SignUp = () => {
   const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
     await userEmailSignUp(data)
       .then(() => {
-        console.log("ユーザー新規登録しました");
         showFlashMessage("ユーザー登録成功しました", "success");
 
         // Homeページへ遷移

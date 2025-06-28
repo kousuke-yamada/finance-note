@@ -18,7 +18,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { auth, db } from "./firebase";
-import { format } from "date-fns";
 import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -40,8 +39,6 @@ function App() {
   const [user, loading, error] = useAuthState(auth);
   const uid = user ? user.uid : "guest";
 
-  console.log("現在のUID", uid);
-
   // firestoreからデータ取得
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -60,11 +57,9 @@ function App() {
         setTransactions(transactionsData);
       } catch (err) {
         if (isFireStoreError(err)) {
-          console.error("firestoreのエラー :", err);
-          console.error("firestoreのエラーメッセージ :", err.message);
-          console.error("firestoreのエラーコード :", err.code);
+          console.error("FireStoreデータ取得エラー :", err);
         } else {
-          console.log("一般的なエラー :", err);
+          console.error("データ取得エラー:", err);
         }
       } finally {
         setIsLoading(false);
@@ -85,7 +80,6 @@ function App() {
         collection(db, "users", uid, "Transactions"),
         transaction
       );
-      console.log("Document written with ID: ", docRef.id);
 
       const newTransaction = {
         id: docRef.id,
@@ -97,11 +91,9 @@ function App() {
       ]);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ保存エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ保存エラー:", err);
       }
     }
   };
@@ -127,11 +119,9 @@ function App() {
       setTransactions(filteredTransactions);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ削除エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ削除エラー :", err);
       }
     }
   };
@@ -153,11 +143,9 @@ function App() {
       setTransactions(updatedTransactions);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ更新エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ更新エラー :", err);
       }
     }
   };

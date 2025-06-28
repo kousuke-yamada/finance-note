@@ -1,12 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  useMediaQuery,
-  useStepContext,
-  useTheme,
-} from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import React, { useState } from "react";
 import MonthlySummary from "../components/MonthlySummary";
 import Calendar from "../components/Calendar";
@@ -47,7 +39,6 @@ const Home = ({
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
-  console.log("isMobile", isMobile);
 
   const dailyTransactions = monthlyTransactions.filter((transaction) => {
     return transaction.date === currentDay;

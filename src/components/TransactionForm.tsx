@@ -127,7 +127,6 @@ const TransactionForm = ({
     if (selectedTransaction) {
       onUpdateTransaction(data, selectedTransaction.id)
         .then(() => {
-          console.log("更新しました。");
           setSelectedTransaction(null);
           if (isMobile) {
             setIsDialogOpen(false);
@@ -139,7 +138,6 @@ const TransactionForm = ({
     } else {
       onSaveTransaction(data)
         .then(() => {
-          console.log("保存しました。");
           if (isMobile) {
             setIsDialogOpen(false);
           }

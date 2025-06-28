@@ -1,54 +1,19 @@
+import { FirebaseAuthErrorCode } from "../firebase";
 import {
-  createUserWithEmailAndPassword,
-  getAdditionalUserInfo,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  User,
-} from "firebase/auth";
-import React, { useState } from "react";
-import { auth, db, FirebaseAuthErrorCode, provider } from "../firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import {
-  AppBar,
   Box,
   Button,
-  ButtonGroup,
   Divider,
-  IconButton,
   Stack,
   TextField,
-  Toolbar,
   Typography,
 } from "@mui/material";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { Link, useNavigate } from "react-router-dom";
 import { useFlashMessage } from "../contexts/FlashMessageContext";
-import {
-  Controller,
-  SubmitErrorHandler,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
-import { Schema } from "zod";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { userSignInSchema, SignInSchema } from "../validations/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  getAuthErrorMessage,
-  userEmailSignIn,
-  userGoogleLogin,
-} from "../utils/auth";
+import { getAuthErrorMessage, userEmailSignIn } from "../utils/auth";
 import { FirebaseError } from "firebase/app";
-import { er } from "@fullcalendar/core/internal-common";
 import GoogleAuth from "../components/common/GoogleAuth";
 
 const SignIn = () => {
@@ -71,7 +36,6 @@ const SignIn = () => {
   const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
     await userEmailSignIn(data)
       .then(() => {
-        console.log("メールアドレスでログインしました。");
         showFlashMessage("ログインしました", "success");
 
         // Homeページへ遷移

@@ -8,7 +8,6 @@ import { Balance, CalendarContent, Transaction } from "../types";
 import { calculateDailyBalances } from "../utils/financeCalculations";
 import { formatCurrency } from "../utils/formatting";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
-import { Palette } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
 import { isSameMonth } from "date-fns";
 
@@ -55,7 +54,6 @@ const Calendar = ({
     display: "background",
     backgroundColor: theme.palette.incomeColor.light,
   };
-  console.log([...calendarEvents, backgroundEvent]);
 
   const renderEventContent = (eventinfo: EventContentArg) => {
     return (
@@ -82,10 +80,6 @@ const Calendar = ({
       setCurrentDay(today);
     }
   };
-
-  // const handaleDateClick = (dateInfo: DateClickArg) => {
-  //   setCurrentDay(dateInfo.dateStr);
-  // };
 
   return (
     <FullCalendar
