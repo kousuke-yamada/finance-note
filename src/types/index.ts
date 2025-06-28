@@ -29,3 +29,15 @@ export interface CalendarContent {
   expense: string;
   balance: string;
 }
+
+export type ProviderType = "email" | "google";
+
+export interface UserData {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  provider: ProviderType;
+  photoURL: string | null;
+  createAt: any;
+  lastLoginAt: any;
+}

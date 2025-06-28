@@ -21,9 +21,10 @@ import { auth, db } from "./firebase";
 import { format } from "date-fns";
 import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
-import Login from "./pages/Login";
+import Login from "./pages/SignIn";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FlashMessageProvider } from "./contexts/FlashMessageContext";
+import SignUp from "./pages/SignUp";
 
 function App() {
   function isFireStoreError(
@@ -195,6 +196,7 @@ function App() {
                 }
               />
               <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route path="*" element={<NoMatch />} />
             </Route>
           </Routes>
