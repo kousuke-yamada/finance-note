@@ -1,6 +1,4 @@
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
-import React from "react";
-import { theme } from "../theme/theme";
 import { Transaction } from "../types";
 import { financeCalculations } from "../utils/financeCalculations";
 import { formatCurrency } from "../utils/formatting";
@@ -39,6 +37,7 @@ const DailySummary = ({ dailyTransactions, coloums }: DailySummaryProps) => {
             </CardContent>
           </Card>
         </Grid>
+
         {/* 支出 */}
         <Grid size={{ xs: isThreeColumsLayout ? 4 : 6 }} display={"flex"}>
           <Card
@@ -61,6 +60,7 @@ const DailySummary = ({ dailyTransactions, coloums }: DailySummaryProps) => {
             </CardContent>
           </Card>
         </Grid>
+
         {/* 残高 */}
         <Grid size={{ xs: isThreeColumsLayout ? 4 : 12 }} display={"flex"}>
           <Card

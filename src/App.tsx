@@ -18,13 +18,12 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { auth, db } from "./firebase";
-import { format } from "date-fns";
 import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
-import Login from "./pages/SignIn";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FlashMessageProvider } from "./contexts/FlashMessageContext";
 import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
 
 function App() {
   function isFireStoreError(
@@ -39,8 +38,6 @@ function App() {
 
   const [user, loading, error] = useAuthState(auth);
   const uid = user ? user.uid : "guest";
-
-  console.log("現在のUID", uid);
 
   // firestoreからデータ取得
   useEffect(() => {
@@ -60,11 +57,9 @@ function App() {
         setTransactions(transactionsData);
       } catch (err) {
         if (isFireStoreError(err)) {
-          console.error("firestoreのエラー :", err);
-          console.error("firestoreのエラーメッセージ :", err.message);
-          console.error("firestoreのエラーコード :", err.code);
+          console.error("FireStoreデータ取得エラー :", err);
         } else {
-          console.log("一般的なエラー :", err);
+          console.error("データ取得エラー:", err);
         }
       } finally {
         setIsLoading(false);
@@ -79,15 +74,12 @@ function App() {
 
   // 取引を保存する処理
   const handleSaveTransaction = async (transaction: Schema) => {
-    // console.log("送信データ", transaction);
     try {
       // fireStoreにデータを保存
-      // Add a new document with a generated id.
       const docRef = await addDoc(
         collection(db, "users", uid, "Transactions"),
         transaction
       );
-      console.log("Document written with ID: ", docRef.id);
 
       const newTransaction = {
         id: docRef.id,
@@ -99,11 +91,9 @@ function App() {
       ]);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ保存エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ保存エラー:", err);
       }
     }
   };
@@ -129,11 +119,9 @@ function App() {
       setTransactions(filteredTransactions);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ削除エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ削除エラー :", err);
       }
     }
   };
@@ -155,11 +143,9 @@ function App() {
       setTransactions(updatedTransactions);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ更新エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ更新エラー :", err);
       }
     }
   };
@@ -195,7 +181,7 @@ function App() {
                   />
                 }
               />
-              <Route path="/login" element={<Login />} />
+              <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="*" element={<NoMatch />} />
             </Route>

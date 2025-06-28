@@ -1,4 +1,3 @@
-import { Password } from "@mui/icons-material";
 import { z } from "zod";
 
 export const transactionSchema = z.object({
