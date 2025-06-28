@@ -1,3 +1,4 @@
+import { Password } from "@mui/icons-material";
 import { z } from "zod";
 
 export const transactionSchema = z.object({
@@ -24,4 +25,31 @@ export const transactionSchema = z.object({
     }),
 });
 
+export const userSignUpSchema = z
+  .object({
+    name: z.string().min(1, { message: "ユーザー名は必須です" }),
+    email: z
+      .string()
+      .email({ message: "有効なメールアドレスを入力してください" }),
+    password: z
+      .string()
+      .min(6, { message: "パスワードは6文字以上で入力してください" }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "パスワードが一致しません",
+    path: ["confirmPassword"],
+  });
+
+export const userSignInSchema = z.object({
+  email: z
+    .string()
+    .email({ message: "有効なメールアドレスを入力してください" }),
+  password: z
+    .string()
+    .min(6, { message: "パスワードは6文字以上で入力してください" }),
+});
+
 export type Schema = z.infer<typeof transactionSchema>;
+export type SignUpSchema = z.infer<typeof userSignUpSchema>;
+export type SignInSchema = z.infer<typeof userSignInSchema>;
