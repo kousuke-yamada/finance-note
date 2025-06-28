@@ -21,10 +21,10 @@ import { auth, db } from "./firebase";
 import { format } from "date-fns";
 import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
-import Login from "./pages/SignIn";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FlashMessageProvider } from "./contexts/FlashMessageContext";
 import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
 
 function App() {
   function isFireStoreError(
@@ -79,10 +79,8 @@ function App() {
 
   // 取引を保存する処理
   const handleSaveTransaction = async (transaction: Schema) => {
-    // console.log("送信データ", transaction);
     try {
       // fireStoreにデータを保存
-      // Add a new document with a generated id.
       const docRef = await addDoc(
         collection(db, "users", uid, "Transactions"),
         transaction
@@ -195,7 +193,7 @@ function App() {
                   />
                 }
               />
-              <Route path="/login" element={<Login />} />
+              <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="*" element={<NoMatch />} />
             </Route>

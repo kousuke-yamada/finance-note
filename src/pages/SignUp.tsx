@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Divider,
-  Link,
   Stack,
   TextField,
   Typography,
@@ -15,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { getAuthErrorMessage, userEmailSignUp } from "../utils/auth";
 import { useFlashMessage } from "../contexts/FlashMessageContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import GoogleAuth from "../components/common/GoogleAuth";
 
@@ -228,7 +227,7 @@ const SignUp = () => {
       <GoogleAuth />
 
       <Typography sx={{ mt: 4 }} fontWeight={"fontWeightMedium"}>
-        アカウントをお持ちの方は <Link href="/login">こちら</Link>
+        アカウントをお持ちの方は <Link to="/signin">こちら</Link>
       </Typography>
     </Box>
   );

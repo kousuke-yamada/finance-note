@@ -52,7 +52,7 @@ export default function AppLayout() {
       showFlashMessage("ログアウトしました", "success");
 
       // ②  Loginページへ遷移
-      navigate("/login");
+      navigate("/signin");
     } catch (error) {
       console.error("ログアウトに失敗しました", error);
       showFlashMessage("ログアウトに失敗しました", "error");
@@ -139,7 +139,7 @@ function GuestModeHeader() {
       {/* ログインボタン */}
       <Button
         component={Link}
-        to="/login"
+        to="/signin"
         color={"warning"}
         variant="contained"
         sx={{ ml: 1 }}
