@@ -9,6 +9,12 @@ import WorkIcon from "@mui/icons-material/Work";
 import SavingsIcon from "@mui/icons-material/Savings";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 
+/******************************************************
+ * IconComponents Component
+ *
+ * @description 収支カテゴリのアイコン表示用のコンポーネント。
+ * Material-UIで定義されたアイコンコンポーネントを返す。
+ ******************************************************/
 const IconComponents: Record<IncomeCategory | ExpenseCategory, JSX.Element> = {
   食費: <FastfoodIcon fontSize="small" />,
   日用品: <AlarmIcon fontSize="small" />,

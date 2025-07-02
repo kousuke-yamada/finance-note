@@ -16,7 +16,7 @@ export function financeCalculations(transactions: Transaction[]): Balance {
   );
 }
 
-// 1.日付ごとの収支を計算する関数
+// 日付ごとの収支を計算する関数
 export function calculateDailyBalances(
   transactions: Transaction[]
 ): Record<string, Balance> {

@@ -6,11 +6,21 @@ import { Transaction } from "../types";
 import { financeCalculations } from "../utils/financeCalculations";
 import { formatCurrency } from "../utils/formatting";
 
+/**
+ * MonthlySummaryコンポーネントの Props 型定義
+ * @property {Transaction[]} monthlyTransactions - 対象月の全収支情報
+ */
 interface MonthlySummaryProps {
   monthlyTransactions: Transaction[];
 }
 
+/******************************************************
+ * MonthlySummary Component
+ *
+ * @description 対象月の合計収支を表示するコンポーネント
+ ******************************************************/
 const MonthlySummary = ({ monthlyTransactions }: MonthlySummaryProps) => {
+  /** 対象月の収入・支出・残高を取得 */
   const { income, expense, balance } = financeCalculations(monthlyTransactions);
 
   return (

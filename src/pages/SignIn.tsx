@@ -16,10 +16,19 @@ import { getAuthErrorMessage, userEmailSignIn } from "../utils/auth";
 import { FirebaseError } from "firebase/app";
 import GoogleAuth from "../components/common/GoogleAuth";
 
+/******************************************************
+ * SignIn Component
+ *
+ * @description ログインページを表示するコンポーネント
+ ******************************************************/
 const SignIn = () => {
   const { showFlashMessage } = useFlashMessage();
   const navigate = useNavigate();
 
+  // ログインフォームの初期化とバリデーション設定
+  // - Zod スキーマ（SignInSchema）によるバリデーション
+  // - email/password の初期値を定義
+  // - フォーム操作用の関数（control, handleSubmit, reset など）を取得
   const {
     control,
     handleSubmit,
@@ -33,6 +42,7 @@ const SignIn = () => {
     resolver: zodResolver(userSignInSchema),
   });
 
+  /** ログインボタン押下時（フォーム内容送信時）の処理 */
   const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
     await userEmailSignIn(data)
       .then(() => {

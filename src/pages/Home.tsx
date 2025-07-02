@@ -9,6 +9,19 @@ import { format } from "date-fns";
 import { Schema } from "../validations/schema";
 import { DateClickArg } from "@fullcalendar/interaction";
 
+/**
+ * Homeコンポーネントの Props 型定義
+ * @property {Transaction[]} monthlyTransactions - 対象月の全収支情報
+ * @property {Dispatch<SetStateAction<Date>>} setCurrentMonth - 現在表示している月のステート更新関数
+ * @property {(transaction: Schema) => Promise<void>} onSaveTransaction - 対象日の収支データをFirebaseに保存する非同期関数
+ * @property {(
+    transactionId: string | readonly string[]
+  ) => Promise<void>} onDeleteTransaction - 選択中の取引カードの収支データをFirebaseから削除する非同期関数
+* @property {(
+    transaction: Schema,
+    transactionId: string
+  ) => Promise<void>} onUpdateTransaction - 選択中の取引カードの収支データをFirebaseへ保存（更新）する非同期関数
+ */
 interface HomeProps {
   monthlyTransactions: Transaction[];
   setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>;
@@ -22,6 +35,11 @@ interface HomeProps {
   ) => Promise<void>;
 }
 
+/******************************************************
+ * Home Component
+ *
+ * @description Homeページを表示するコンポーネント
+ ******************************************************/
 const Home = ({
   monthlyTransactions,
   setCurrentMonth,
@@ -38,13 +56,19 @@ const Home = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const theme = useTheme();
+
+  /** モバイル判定フラグ
+   * （画面幅が"lg"ブレークポイント（1200px）未満の場合、モバイル用
+   * （画面幅が"lg"ブレークポイント（1200px）以上の場合、PC用
+   */
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
 
+  /** 現在選択中の日付に対応する収支データを取得 */
   const dailyTransactions = monthlyTransactions.filter((transaction) => {
     return transaction.date === currentDay;
   });
 
-  // 【×ボタン】押下時の処理
+  /**  【×ボタン】押下時の処理 */
   const CloseForm = () => {
     setSelectedTransaction(null);
 
@@ -54,7 +78,8 @@ const Home = ({
       setIsEntryDrawerOpen(!isEntryDrawerOpen);
     }
   };
-  // 【+内訳を追加ボタン】押下時の処理（フォームの開閉処理）
+
+  /** 【+内訳を追加ボタン】押下時の処理（フォームの開閉処理 */
   const handleAddTransactionForm = () => {
     if (isMobile) {
       setIsDialogOpen(true);
@@ -67,7 +92,7 @@ const Home = ({
     }
   };
 
-  // 取引カード選択時の処理
+  /** 取引カード選択時の処理 */
   const handleSelectTransaction = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
 
@@ -78,11 +103,12 @@ const Home = ({
     }
   };
 
-  //モバイル用Drawerを閉じる処理
+  /** モバイル用Drawerを閉じる処理 */
   const handleCloseMobileDrawer = () => {
     setIsMobileDrawerOpen(false);
   };
 
+  /** カレンダー上の日付クリック時の処理 */
   const handaleDateClick = (dateInfo: DateClickArg) => {
     setCurrentDay(dateInfo.dateStr);
     setIsMobileDrawerOpen(true);
