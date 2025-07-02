@@ -16,7 +16,7 @@ import {
 import { ProviderType, UserData } from "../types";
 import { SignUpSchema, SignInSchema } from "../validations/schema";
 
-// サインアップ処理（メールアドレス）
+/** サインアップ処理（メールアドレス認証) */
 export async function userEmailSignUp(userData: SignUpSchema): Promise<void> {
   try {
     // ① firebase Authenticationへ、Emailでアカウント作成
@@ -37,7 +37,7 @@ export async function userEmailSignUp(userData: SignUpSchema): Promise<void> {
   }
 }
 
-// サインイン処理（メールアドレス）
+/** サインイン処理（メールアドレス認証) */
 export async function userEmailSignIn(userData: SignInSchema): Promise<void> {
   try {
     // ① firebase Authenticationへ、Emailでアカウント作成
@@ -56,7 +56,7 @@ export async function userEmailSignIn(userData: SignInSchema): Promise<void> {
   }
 }
 
-// サインアップ・サインイン処理（Google認証）
+//** サインアップ・サインイン処理（Google認証） */
 export async function userGoogleLogin(): Promise<void> {
   try {
     // ① firebase Authenticationへ、Googleログイン
@@ -71,7 +71,7 @@ export async function userGoogleLogin(): Promise<void> {
   }
 }
 
-// ユーザー情報設定処理（新規/既存ユーザー判定）
+/** ユーザー情報設定処理（新規/既存ユーザー判定） */
 const setUserData = async (
   user: User,
   providerType: ProviderType,
@@ -105,7 +105,7 @@ const setUserData = async (
   }
 };
 
-// FirebaseAuthエラーコード取得処理
+/** FirebaseAuthエラーコード取得処理 */
 export const getAuthErrorMessage = (code: FirebaseAuthErrorCode): string => {
   switch (code) {
     case FirebaseAuthErrorCode.USER_NOT_FOUND:

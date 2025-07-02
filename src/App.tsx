@@ -25,21 +25,29 @@ import { FlashMessageProvider } from "./contexts/FlashMessageContext";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 
+/******************************************************
+ * App Component
+ *
+ * @description アプリケーションのルートコンポーネント
+ ******************************************************/
 function App() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(true);
+
+  /** ユーザー情報（Firebase Authenticationからユーザー情報取得） */
+  const [user] = useAuthState(auth);
+  /** ユーザーID（非ログイン時はゲスト扱い） */
+  const uid = user ? user.uid : "guest";
+
+  /** FireStoreエラー判定 */
   function isFireStoreError(
     err: unknown
   ): err is { code: string; message: string } {
     return typeof err === "object" && err !== null && "code" in err;
   }
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [user, loading, error] = useAuthState(auth);
-  const uid = user ? user.uid : "guest";
-
-  // firestoreからデータ取得
+  /** FireStore Databaseからの収支データ取得処理 */
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -68,11 +76,12 @@ function App() {
     fetchTransactions();
   }, [uid]);
 
+  /** 対象月の全収支データ */
   const monthlyTransactions = transactions.filter((transaction) => {
     return transaction.date.startsWith(formatMonth(currentMonth));
   });
 
-  // 取引を保存する処理
+  /** FireStore Databaseへの収支データ追加処理 */
   const handleSaveTransaction = async (transaction: Schema) => {
     try {
       // fireStoreにデータを保存
@@ -98,7 +107,7 @@ function App() {
     }
   };
 
-  // 取引を削除する処理
+  /** FireStore Databaseの収支データ削除処理 */
   const handleDeleteTransaction = async (
     transactionIds: string | readonly string[]
   ) => {
@@ -126,6 +135,7 @@ function App() {
     }
   };
 
+  /** FireStore Databaseの収支データ更新処理 */
   const handleUpdateTransaction = async (
     transaction: Schema,
     transactionId: string
@@ -133,7 +143,6 @@ function App() {
     try {
       // firestoreのデータ更新
       const docRef = doc(db, "users", uid, "Transactions", transactionId);
-      // Set the "capital" field of the city 'DC'
       await updateDoc(docRef, transaction);
 
       //画面更新
