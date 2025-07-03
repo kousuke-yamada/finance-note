@@ -1,5 +1,9 @@
 import { Balance, Transaction } from "../types";
 
+/** 収支データの計算処理
+ * 入力された収支データを以下の形式にして返す。
+ * {income: 1000,expense: 700, balance: 300 }
+ */
 export function financeCalculations(transactions: Transaction[]): Balance {
   return transactions.reduce(
     (acc, transaction) => {
@@ -16,7 +20,10 @@ export function financeCalculations(transactions: Transaction[]): Balance {
   );
 }
 
-// 1.日付ごとの収支を計算する関数
+/** 日毎収支の計算処理
+ * 入力された収支データを以下形式にして返す。日付に収支を紐づける。
+ * ["2025-01-01"] = {income: 1000,expense: 700, balance: 300 }
+ */
 export function calculateDailyBalances(
   transactions: Transaction[]
 ): Record<string, Balance> {

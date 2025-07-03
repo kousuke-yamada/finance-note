@@ -1,6 +1,6 @@
-import { Password } from "@mui/icons-material";
 import { z } from "zod";
 
+/** 収支データ入力フォーム用スキーマ */
 export const transactionSchema = z.object({
   type: z.enum(["income", "expense"]),
   date: z.string().min(1, { message: "日付は必須です" }),
@@ -25,6 +25,7 @@ export const transactionSchema = z.object({
     }),
 });
 
+/** ユーザーアカウント作成フォーム用スキーマ */
 export const userSignUpSchema = z
   .object({
     name: z.string().min(1, { message: "ユーザー名は必須です" }),
@@ -41,6 +42,7 @@ export const userSignUpSchema = z
     path: ["confirmPassword"],
   });
 
+/** ユーザーログインフォーム用スキーマ */
 export const userSignInSchema = z.object({
   email: z
     .string()

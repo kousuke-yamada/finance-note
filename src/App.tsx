@@ -18,31 +18,36 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { auth, db } from "./firebase";
-import { format } from "date-fns";
 import { formatMonth } from "./utils/formatting";
 import { Schema } from "./validations/schema";
-import Login from "./pages/SignIn";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { FlashMessageProvider } from "./contexts/FlashMessageContext";
 import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
 
+/******************************************************
+ * App Component
+ *
+ * @description アプリケーションのルートコンポーネント
+ ******************************************************/
 function App() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(true);
+
+  /** ユーザー情報（Firebase Authenticationからユーザー情報取得） */
+  const [user] = useAuthState(auth);
+  /** ユーザーID（非ログイン時はゲスト扱い） */
+  const uid = user ? user.uid : "guest";
+
+  /** FireStoreエラー判定 */
   function isFireStoreError(
     err: unknown
   ): err is { code: string; message: string } {
     return typeof err === "object" && err !== null && "code" in err;
   }
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [user, loading, error] = useAuthState(auth);
-  const uid = user ? user.uid : "guest";
-
-  console.log("現在のUID", uid);
-
-  // firestoreからデータ取得
+  /** FireStore Databaseからの収支データ取得処理 */
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -60,11 +65,9 @@ function App() {
         setTransactions(transactionsData);
       } catch (err) {
         if (isFireStoreError(err)) {
-          console.error("firestoreのエラー :", err);
-          console.error("firestoreのエラーメッセージ :", err.message);
-          console.error("firestoreのエラーコード :", err.code);
+          console.error("FireStoreデータ取得エラー :", err);
         } else {
-          console.log("一般的なエラー :", err);
+          console.error("データ取得エラー:", err);
         }
       } finally {
         setIsLoading(false);
@@ -73,21 +76,19 @@ function App() {
     fetchTransactions();
   }, [uid]);
 
+  /** 対象月の全収支データ */
   const monthlyTransactions = transactions.filter((transaction) => {
     return transaction.date.startsWith(formatMonth(currentMonth));
   });
 
-  // 取引を保存する処理
+  /** FireStore Databaseへの収支データ追加処理 */
   const handleSaveTransaction = async (transaction: Schema) => {
-    // console.log("送信データ", transaction);
     try {
       // fireStoreにデータを保存
-      // Add a new document with a generated id.
       const docRef = await addDoc(
         collection(db, "users", uid, "Transactions"),
         transaction
       );
-      console.log("Document written with ID: ", docRef.id);
 
       const newTransaction = {
         id: docRef.id,
@@ -99,16 +100,14 @@ function App() {
       ]);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ保存エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ保存エラー:", err);
       }
     }
   };
 
-  // 取引を削除する処理
+  /** FireStore Databaseの収支データ削除処理 */
   const handleDeleteTransaction = async (
     transactionIds: string | readonly string[]
   ) => {
@@ -129,15 +128,14 @@ function App() {
       setTransactions(filteredTransactions);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ削除エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ削除エラー :", err);
       }
     }
   };
 
+  /** FireStore Databaseの収支データ更新処理 */
   const handleUpdateTransaction = async (
     transaction: Schema,
     transactionId: string
@@ -145,7 +143,6 @@ function App() {
     try {
       // firestoreのデータ更新
       const docRef = doc(db, "users", uid, "Transactions", transactionId);
-      // Set the "capital" field of the city 'DC'
       await updateDoc(docRef, transaction);
 
       //画面更新
@@ -155,11 +152,9 @@ function App() {
       setTransactions(updatedTransactions);
     } catch (err) {
       if (isFireStoreError(err)) {
-        console.error("firestoreのエラー :", err);
-        console.error("firestoreのエラーメッセージ :", err.message);
-        console.error("firestoreのエラーコード :", err.code);
+        console.error("FireStoreデータ更新エラー :", err);
       } else {
-        console.log("一般的なエラー :", err);
+        console.error("データ更新エラー :", err);
       }
     }
   };
@@ -195,7 +190,7 @@ function App() {
                   />
                 }
               />
-              <Route path="/login" element={<Login />} />
+              <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="*" element={<NoMatch />} />
             </Route>

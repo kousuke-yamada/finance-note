@@ -1,58 +1,56 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import SideBar from "../common/SideBar";
-import { Avatar, Button, CSSProperties } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
 import { useFlashMessage } from "../../contexts/FlashMessageContext";
+import Header from "../common/Header";
 
+/** サイドバーの画面幅 */
 const drawerWidth = 240;
 
-export default function AppLayout() {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [isClosing, setIsClosing] = React.useState(false);
+/******************************************************
+ * AppLayout Component
+ *
+ * @description 画面レイアウト表示用のコンポーネント。
+ * 全ページに共通のヘッダー・サイドバー・メインコンテンツ部分の枠組みを設定。
+ ******************************************************/
+const AppLayout = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const { showFlashMessage } = useFlashMessage();
 
-  const baseLinkStyle: CSSProperties = {
-    textDecoration: "none",
-    color: "inherit",
-    display: "block",
-  };
-
+  /** モバイル用:サイドバーDrawerクローズ時の処理 */
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
   };
-
+  /** モバイル用：サイドバーDrawer開閉アニメーション完了時の処理 */
   const handleDrawerTransitionEnd = () => {
     setIsClosing(false);
   };
 
+  /** モバイル用：ハンバーガーメニュー押下時の処理 */
   const handleDrawerToggle = () => {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
     }
   };
 
+  /** ログアウトボタン押下時の処理（ユーザーログイン状態） */
   const handleLogout = async () => {
     try {
-      // ① Firebase Authenticationからログアウト
+      // Firebase Authenticationからログアウト
       await signOut(auth);
-
       showFlashMessage("ログアウトしました", "success");
-
-      // ②  Loginページへ遷移
-      navigate("/login");
+      // ログインページへ遷移
+      navigate("/signin");
     } catch (error) {
       console.error("ログアウトに失敗しました", error);
       showFlashMessage("ログアウトに失敗しました", "error");
@@ -68,44 +66,14 @@ export default function AppLayout() {
       }}
     >
       <CssBaseline />
-      {/* ヘッダー */}
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: "none" } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, textAlign: "left" }}
-          >
-            Finance Note
-          </Typography>
 
-          {user ? (
-            <MemberModeHeader
-              name={user.displayName}
-              photoPath={user.photoURL}
-              onLogout={handleLogout}
-            />
-          ) : (
-            <GuestModeHeader />
-          )}
-        </Toolbar>
-      </AppBar>
+      {/* ヘッダー */}
+      <Header
+        user={user}
+        drawerWidth={drawerWidth}
+        handleDrawerToggle={handleDrawerToggle}
+        handleLogout={handleLogout}
+      />
 
       {/* サイドバー */}
       <SideBar
@@ -129,56 +97,6 @@ export default function AppLayout() {
       </Box>
     </Box>
   );
-}
+};
 
-function GuestModeHeader() {
-  return (
-    <>
-      {/* 名前 */}
-      <Typography variant="subtitle1">ゲスト さん</Typography>
-      {/* ログインボタン */}
-      <Button
-        component={Link}
-        to="/login"
-        color={"warning"}
-        variant="contained"
-        sx={{ ml: 1 }}
-      >
-        ログイン
-      </Button>
-    </>
-  );
-}
-
-interface MemberModeHeaderProps {
-  name: string | null;
-  photoPath: string | null;
-  onLogout: () => Promise<void>;
-}
-
-function MemberModeHeader({
-  name,
-  photoPath,
-  onLogout,
-}: MemberModeHeaderProps) {
-  return (
-    <>
-      {/* 写真 */}
-      {photoPath && (
-        <Avatar alt="Google Photo" src={photoPath} sx={{ mr: 1 }} />
-      )}
-      {/* ユーザー名 */}
-      {name && <Typography variant="subtitle1">{name} さん</Typography>}
-
-      {/* ログアウトボタン */}
-      <Button
-        color={"info"}
-        variant="contained"
-        sx={{ ml: 1 }}
-        onClick={onLogout}
-      >
-        ログアウト
-      </Button>
-    </>
-  );
-}
+export default AppLayout;

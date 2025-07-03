@@ -1,4 +1,3 @@
-import * as React from "react";
 import { alpha, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -21,16 +20,31 @@ import { Grid } from "@mui/material";
 import { formatCurrency } from "../utils/formatting";
 import IconComponents from "./common/IconComponents";
 import { compareDesc, parseISO } from "date-fns";
+import { ChangeEvent, MouseEvent, useMemo, useState } from "react";
 
+/**
+ * TransactionTableHeadコンポーネントの Props 型定義
+ * @property {number} numSelected - 収支テーブルのチェックボックス選択数
+ * @property {(event: ChangeEvent<HTMLInputElement>) => void} onSelectAllClick - 収支テーブルのチェックボックス一括選択時のコールバック関数
+ * @property {number} rowCount - テーブル行数（※表示する収支データの件数）
+ */
 interface TransactionTableHeadProps {
   numSelected: number;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
   rowCount: number;
 }
 
-function TransactionTableHead(props: TransactionTableHeadProps) {
-  const { onSelectAllClick, numSelected, rowCount } = props;
-
+/******************************************************
+ * TransactionTableHead Component
+ *
+ * @description 収支データテーブルのヘッダ部を表示するコンポーネント。
+ * ヘッダ部のチェックボックスにより、各項目のチェックボックス一括選択が可能。
+ ******************************************************/
+function TransactionTableHead({
+  onSelectAllClick,
+  numSelected,
+  rowCount,
+}: TransactionTableHeadProps) {
   return (
     <TableHead>
       <TableRow>
@@ -56,14 +70,27 @@ function TransactionTableHead(props: TransactionTableHeadProps) {
     </TableHead>
   );
 }
+
+/**
+ * TransactionTableToolbarコンポーネントの Props 型定義
+ * @property {number} numSelected - 収支テーブルのチェックボックス選択数
+ * @property {() => void} onDelete - 削除ボタン（ゴミ箱アイコン）押下時のコールバック関数
+ */
 interface TransactionTableToolbarProps {
   numSelected: number;
   onDelete: () => void;
 }
 
-// ツールバー
-function TransactionTableToolbar(props: TransactionTableToolbarProps) {
-  const { numSelected, onDelete } = props;
+/******************************************************
+ * TransactionTableToolbar Component
+ *
+ * @description 収支データテーブルのツールバーを表示するコンポーネント。
+ * ヘッダ部、及び、各収支データのチェックボックス選択時にこのツールバーを表示。
+ ******************************************************/
+function TransactionTableToolbar({
+  numSelected,
+  onDelete,
+}: TransactionTableToolbarProps) {
   return (
     <Toolbar
       sx={[
@@ -112,12 +139,24 @@ function TransactionTableToolbar(props: TransactionTableToolbarProps) {
   );
 }
 
+/**
+ * FinancialItemコンポーネントの Props 型定義
+ * @property {string} title - 表示タイトル
+ * @property {number} value - 表示金額
+ * @property {string} color -　　表示文字色
+ */
 interface FinancialItemProps {
   title: string;
   value: number;
   color: string;
 }
-// 月間収支表示
+
+/******************************************************
+ * FinancialItem Component
+ *
+ * @description 収支項目を表示するコンポーネント。
+ *　入力値に対して、「支出 ¥1,000」の形式で出力する。
+ ******************************************************/
 function FinancialItem({ title, value, color }: FinancialItemProps) {
   return (
     <Grid size={{ xs: 4 }} textAlign={"center"}>
@@ -139,6 +178,13 @@ function FinancialItem({ title, value, color }: FinancialItemProps) {
   );
 }
 
+/**
+ * TransactionTableコンポーネントの Props 型定義
+ * @property {Transaction[]} monthlyTransactions - 対象月の全収支情報
+ * @property {(
+    transactionId: string | readonly string[]
+  ) => Promise<void>} onDeleteTransaction - 対象の収支データをFirebaseから削除する非同期関数
+ */
 interface TransactionTableProps {
   monthlyTransactions: Transaction[];
   onDeleteTransaction: (
@@ -146,17 +192,23 @@ interface TransactionTableProps {
   ) => Promise<void>;
 }
 
-// テーブル本体
-export default function TransactionTable({
+/******************************************************
+ * TransactionTable Component
+ *
+ * @description 収支テーブル本体を表示するコンポーネント。
+ *　月間収支表示、ツールバー、ヘッダ、ボディ、フッターで構成。
+ ******************************************************/
+const TransactionTable = ({
   monthlyTransactions,
   onDeleteTransaction,
-}: TransactionTableProps) {
+}: TransactionTableProps) => {
   const theme = useTheme();
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [selected, setSelected] = useState<readonly string[]>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  /** 収支テーブルヘッダ：チェックボックス一括選択時の処理 */
+  const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const newSelected = monthlyTransactions.map((n) => n.id);
       setSelected(newSelected);
@@ -165,7 +217,8 @@ export default function TransactionTable({
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: string) => {
+  /** 収支テーブルボディ：収支データの行をクリックした時の処理 */
+  const handleClick = (event: MouseEvent<unknown>, id: string) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: readonly string[] = [];
 
@@ -184,29 +237,34 @@ export default function TransactionTable({
     setSelected(newSelected);
   };
 
+  /** 収支テーブルフッター：ページネーションのページ切り替えボタン押下時の処理 */
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  /** 収支テーブルフッター：テーブルの収支データ表示件数（Rows per page）変更ボタン押下時の処理 */
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
+  /** 収支テーブルツールバー：削除ボタン（ゴミ箱アイコン）押下時の処理 */
   const handleDelete = () => {
     onDeleteTransaction(selected);
   };
 
-  // Avoid a layout jump when reaching the last page with empty rows.
+  /** テーブルボディ：空行数設定（レイアウト調整用）
+   *  収支データのページネーションの最終ページにて、データ表示件数（Rows per page）に足りない分を空行で埋める。
+   */
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * rowsPerPage - monthlyTransactions.length)
       : 0;
 
-  // 取引データから表示件数分取得
-  const visibleRows = React.useMemo(() => {
+  /** テーブルボディ： データ表示件数（Rows per page）分の収支データを取得
+   *  日付が新しいデータから降順でソートする。
+   */
+  const visibleRows = useMemo(() => {
     const sortMonthlyTransactions = [...monthlyTransactions].sort((a, b) =>
       compareDesc(parseISO(a.date), parseISO(b.date))
     );
@@ -216,6 +274,7 @@ export default function TransactionTable({
     );
   }, [page, rowsPerPage, monthlyTransactions]);
 
+  /** 月間収支表示：対象月の各収支タイプ（収入・支出・残高）ごとの合計値 */
   const { income, expense, balance } = financeCalculations(monthlyTransactions);
 
   return (
@@ -337,4 +396,6 @@ export default function TransactionTable({
       </Paper>
     </Box>
   );
-}
+};
+
+export default TransactionTable;

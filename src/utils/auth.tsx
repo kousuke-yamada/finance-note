@@ -6,8 +6,6 @@ import {
   User,
 } from "firebase/auth";
 import { auth, db, FirebaseAuthErrorCode, provider } from "../firebase";
-import { useFlashMessage } from "../contexts/FlashMessageContext";
-import { useNavigate } from "react-router-dom";
 import {
   doc,
   getDoc,
@@ -18,7 +16,7 @@ import {
 import { ProviderType, UserData } from "../types";
 import { SignUpSchema, SignInSchema } from "../validations/schema";
 
-// サインアップ処理（メールアドレス）
+/** サインアップ処理（メールアドレス認証) */
 export async function userEmailSignUp(userData: SignUpSchema): Promise<void> {
   try {
     // ① firebase Authenticationへ、Emailでアカウント作成
@@ -31,18 +29,15 @@ export async function userEmailSignUp(userData: SignUpSchema): Promise<void> {
     // プロフィール更新
     await updateProfile(newUser, { displayName: userData.name });
 
-    console.log("ユーザー登録成功", newUser);
-
     // ② Firestore Databaseへユーザー情報を設定
     await setUserData(newUser, "email", userData.name);
-    console.log("②まで完了", newUser.uid);
   } catch (error) {
     console.error("メールアドレスでのユーザー登録失敗", error);
     throw error;
   }
 }
 
-// サインイン処理（メールアドレス）
+/** サインイン処理（メールアドレス認証) */
 export async function userEmailSignIn(userData: SignInSchema): Promise<void> {
   try {
     // ① firebase Authenticationへ、Emailでアカウント作成
@@ -53,36 +48,30 @@ export async function userEmailSignIn(userData: SignInSchema): Promise<void> {
     );
     const loggedInUser = result.user;
 
-    console.log("ログイン成功", loggedInUser);
-
     // ② Firestore Databaseへユーザー情報を設定
     await setUserData(loggedInUser, "email");
-    console.log("②まで完了", loggedInUser.uid);
   } catch (error) {
     console.error("メールアドレスでのログイン失敗", error);
     throw error;
   }
 }
 
-// サインアップ・サインイン処理（Google認証）
+//** サインアップ・サインイン処理（Google認証） */
 export async function userGoogleLogin(): Promise<void> {
   try {
     // ① firebase Authenticationへ、Googleログイン
     const result = await signInWithPopup(auth, provider);
     const loggedInUser = result.user;
 
-    console.log("ログイン成功", loggedInUser);
-
     // ② Firestore Databaseへユーザー情報を設定
     await setUserData(loggedInUser, "google");
-    console.log("Firestoreへユーザーデータ追加完了", loggedInUser.uid);
   } catch (error) {
     console.error("ログイン失敗", error);
     throw error;
   }
 }
 
-// ユーザー情報設定処理（新規/既存ユーザー判定）
+/** ユーザー情報設定処理（新規/既存ユーザー判定） */
 const setUserData = async (
   user: User,
   providerType: ProviderType,
@@ -90,23 +79,15 @@ const setUserData = async (
 ): Promise<void> => {
   try {
     const userDocRef = doc(db, "users", user.uid);
-    console.log("ログインしようとしているユーザーID", user.uid);
-
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
-      console.log("ドキュメントあり");
       // 既存ユーザーの場合 ： ログイン時刻を更新
-      console.log("既存ユーザー", user.uid);
-
       await updateDoc(userDocRef, {
         lastLoginAt: serverTimestamp(),
       });
-      console.log("ログイン時刻を更新");
     } else {
       // 新規ユーザーの場合 ： ドキュメントを新規作成
-      console.log("新規ユーザー", user.uid);
-
       const newUserData: UserData = {
         uid: user.uid,
         displayName: userName ? userName : user.displayName,
@@ -118,14 +99,13 @@ const setUserData = async (
       };
 
       await setDoc(userDocRef, newUserData);
-      console.log("新規ユーザーのドキュメント追加");
     }
   } catch (error) {
     console.error("ユーザーデータ処理エラー", error);
   }
 };
 
-// FirebaseAuthエラーコード取得処理
+/** FirebaseAuthエラーコード取得処理 */
 export const getAuthErrorMessage = (code: FirebaseAuthErrorCode): string => {
   switch (code) {
     case FirebaseAuthErrorCode.USER_NOT_FOUND:
