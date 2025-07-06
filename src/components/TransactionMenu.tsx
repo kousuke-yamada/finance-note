@@ -11,16 +11,23 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React from "react";
-//アイコン
 import NotesIcon from "@mui/icons-material/Notes";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import FastfoodIcon from "@mui/icons-material/Fastfood";
 import DailySummary from "./DailySUmmary";
 import { Transaction } from "../types";
 import { formatCurrency } from "../utils/formatting";
 import IconComponents from "./common/IconComponents";
 
+/**
+ * TransactionMenuコンポーネントの Props 型定義
+ * @property {Transaction[]} dailyTransactions - 対象日の収支情報
+ * @property {string} currentDay - 現在選択している日付
+ * @property {() => void} onAddTransactionForm - +内訳を追加ボタン押下時のコールバック関数
+ * @property {(transaction: Transaction) => void} onSelectTransaction - 取引カード選択時のコールバック関数
+ * @property {boolean} isMobile - モバイルサイズ判定フラグ
+ * @property {boolean} open - モバイル用：日毎収支を表示するDrawerの開閉状態
+ * @property {() => void} onClose - モバイル用：日毎収支を表示するDrawerクローズ時のコールバック関数
+ */
 interface TransactionMenuProps {
   dailyTransactions: Transaction[];
   currentDay: string;
@@ -31,6 +38,12 @@ interface TransactionMenuProps {
   onClose: () => void;
 }
 
+/******************************************************
+ * TransactionMenu Component
+ *
+ * @description 日毎収支一覧を表示するコンポーネント。
+ * 日毎の収支、取引一覧、及び、収支入力フォーム(Drawer)の開閉ボタンを表示。
+ ******************************************************/
 const TransactionMenu = ({
   dailyTransactions,
   currentDay,
@@ -40,7 +53,9 @@ const TransactionMenu = ({
   open,
   onClose,
 }: TransactionMenuProps) => {
+  /** 日毎収支一覧の画面幅 */
   const menuDrawerWidth = 320;
+
   return (
     <Drawer
       sx={{
@@ -68,7 +83,7 @@ const TransactionMenu = ({
       onClose={onClose}
       slotProps={{
         root: {
-          keepMounted: true, // Better open performance on mobile.
+          keepMounted: true,
         },
       }}
     >
@@ -176,4 +191,5 @@ const TransactionMenu = ({
     </Drawer>
   );
 };
+
 export default TransactionMenu;

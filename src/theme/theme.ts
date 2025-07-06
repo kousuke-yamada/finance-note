@@ -10,9 +10,11 @@ import {
   pink,
   purple,
   red,
+  lime,
 } from "@mui/material/colors";
 import { ExpenseCategory, IncomeCategory } from "../types";
 
+// カスタムテーマのプロパティ定義（MUIのテーマ型を拡張）
 declare module "@mui/material/styles" {
   interface Palette {
     incomeColor: PaletteColor;
@@ -30,6 +32,7 @@ declare module "@mui/material/styles" {
   }
 }
 
+// アプリ全体で使用する共通MUIテーマ追加
 export const theme = createTheme({
   typography: {
     fontFamily: 'Noto Sans JP, "Roboto","Helvetica","Arial",sans-serif',
@@ -41,21 +44,21 @@ export const theme = createTheme({
   palette: {
     // 収入用の色を定義
     incomeColor: {
-      main: blue[500],
-      light: blue[100],
-      dark: blue[700],
+      main: lightBlue[500],
+      light: lightBlue[100],
+      dark: lightBlue[700],
     },
     // 支出用の色を定義
     expenseColor: {
-      main: red[500],
-      light: red[100],
-      dark: red[700],
+      main: pink[500],
+      light: pink[100],
+      dark: pink[700],
     },
     // 残高用の色を定義
     balanceColor: {
-      main: green[500],
-      light: green[100],
-      dark: green[700],
+      main: lightGreen[500],
+      light: lightGreen[100],
+      dark: lightGreen[700],
     },
     // 収入カテゴリ用の色定義
     incomeCategoryColor: {

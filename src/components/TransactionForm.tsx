@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close"; // 閉じるボタン用のアイコン
 import FastfoodIcon from "@mui/icons-material/Fastfood"; //食事アイコン
 import AlarmIcon from "@mui/icons-material/Alarm";
@@ -27,15 +27,32 @@ import { ExpenseCategory, IncomeCategory, Transaction } from "../types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Schema, transactionSchema } from "../validations/schema";
 
+/**
+ * TransactionFormコンポーネントの Props 型定義
+ * @property {() => void} onCloseForm - 収支入力フォームの×ボタン押下時のコールバック関数
+ * @property {boolean} isEntryDrawerOpen - 収支入力フォームのDrawer開閉状態
+ * @property {string} currentDay - 現在選択している日付
+ * @property {(transaction: Schema) => Promise<void>} onSaveTransaction - 対象日の収支データをFirebaseに保存する非同期関数
+ * @property {Transaction | null} selectedTransaction - 選択した取引カードの収支データ
+ * @property {Dispatch<SetStateAction<Transaction | null>>} setSelectedTransaction -選択した取引カードの収支内容のステート更新関数
+ * @property {(
+    transactionId: string | readonly string[]
+  ) => Promise<void>} onDeleteTransaction - 選択中の取引カードの収支データをFirebaseから削除する非同期関数
+ * @property {(
+    transaction: Schema,
+    transactionId: string
+  ) => Promise<void>} onUpdateTransaction - 選択中の取引カードの収支データをFirebaseへ保存（更新）する非同期関数
+ * @property {boolean} isMobile - モバイルサイズ判定フラグ
+ * @property {boolean} isDialogOpen - モバイル用収支入力フォームのダイアログ表示判定フラグ
+ * @property {Dispatch<SetStateAction<boolean>>} setIsDialogOpen - モバイル用収支入力フォームのダイアログ表示判定フラグのステート更新関数
+ */
 interface TransactionFormProps {
   onCloseForm: () => void;
   isEntryDrawerOpen: boolean;
   currentDay: string;
   onSaveTransaction: (transaction: Schema) => Promise<void>;
   selectedTransaction: Transaction | null;
-  setSelectedTransaction: React.Dispatch<
-    React.SetStateAction<Transaction | null>
-  >;
+  setSelectedTransaction: Dispatch<SetStateAction<Transaction | null>>;
   onDeleteTransaction: (
     transactionId: string | readonly string[]
   ) => Promise<void>;
@@ -45,16 +62,28 @@ interface TransactionFormProps {
   ) => Promise<void>;
   isMobile: boolean;
   isDialogOpen: boolean;
-  setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
 }
-
+/**
+ * 収支入力フォームのカテゴリ 型定義
+ * @property {IncomeCategory | ExpenseCategory} label - カテゴリのラベル
+ * @property {JSX.Element} icon - カテゴリのアイコン
+ */
 interface CategoryItem {
   label: IncomeCategory | ExpenseCategory;
   icon: JSX.Element;
 }
-
+/** 収支タイプの定義 */
 type IncomeExpense = "income" | "expense";
 
+/** 収支入力フォームの画面幅 */
+const formWidth = 320;
+
+/******************************************************
+ * TransactionForm Component
+ *
+ * @description 対象日の収支入力フォーム表示用のコンポーネント。
+ ******************************************************/
 const TransactionForm = ({
   onCloseForm,
   isEntryDrawerOpen,
@@ -68,8 +97,7 @@ const TransactionForm = ({
   isDialogOpen,
   setIsDialogOpen,
 }: TransactionFormProps) => {
-  const formWidth = 320;
-
+  /** 収支入力フォームの支出カテゴリ定義 */
   const expenseCategories: CategoryItem[] = [
     { label: "食費", icon: <FastfoodIcon fontSize="small" /> },
     { label: "日用品", icon: <AlarmIcon fontSize="small" /> },
@@ -78,15 +106,18 @@ const TransactionForm = ({
     { label: "娯楽", icon: <SportsTennisIcon fontSize="small" /> },
     { label: "交通費", icon: <TrainIcon fontSize="small" /> },
   ];
-
+  /** 収支入力フォームの収入カテゴリ定義 */
   const incomeCategories: CategoryItem[] = [
     { label: "給与", icon: <WorkIcon fontSize="small" /> },
     { label: "副収入", icon: <AddBusinessIcon fontSize="small" /> },
     { label: "お小遣い", icon: <SavingsIcon fontSize="small" /> },
   ];
-
   const [categories, setCategories] = useState(expenseCategories);
 
+  // 収支入力フォームの初期化とバリデーション設定
+  // - Zod スキーマ（transactionSchema）によるバリデーション
+  // - type/date/amount/category/content の初期値を定義
+  // - フォーム操作用の関数（control, setValue, watch など）を取得
   const {
     control,
     setValue,
@@ -105,60 +136,23 @@ const TransactionForm = ({
     resolver: zodResolver(transactionSchema),
   });
 
-  const incomeExpenseToggle = (type: IncomeExpense) => {
-    setValue("type", type);
-    setValue("category", "");
-  };
-
   // 収支タイプを監視
   const currentType = watch("type");
 
+  // 現在選択している日付が変更された時に、フォームの「日付」項目を更新
   useEffect(() => {
     setValue("date", currentDay);
   }, [currentDay]);
 
+  // 収支切り替えボタンにより収支タイプが変更（支出↔︎収入）された時に、カテゴリ項目のステート更新
   useEffect(() => {
     const newCategories =
       currentType === "expense" ? expenseCategories : incomeCategories;
     setCategories(newCategories);
   }, [currentType]);
 
-  const onSubmit: SubmitHandler<Schema> = (data) => {
-    if (selectedTransaction) {
-      onUpdateTransaction(data, selectedTransaction.id)
-        .then(() => {
-          console.log("更新しました。");
-          setSelectedTransaction(null);
-          if (isMobile) {
-            setIsDialogOpen(false);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } else {
-      onSaveTransaction(data)
-        .then(() => {
-          console.log("保存しました。");
-          if (isMobile) {
-            setIsDialogOpen(false);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-    reset({
-      type: "expense",
-      date: currentDay,
-      amount: 0,
-      category: "",
-      content: "",
-    });
-  };
-
+  // 取引カード選択時、その選択した取引カードの収支タイプに応じたカテゴリ項目をフォームに反映
   useEffect(() => {
-    // 選択肢が更新されたか確認
     if (selectedTransaction) {
       const categoryExist = categories.some(
         (category) => category.label === selectedTransaction.category
@@ -167,7 +161,7 @@ const TransactionForm = ({
     }
   }, [selectedTransaction, categories]);
 
-  // フォーム内容を更新
+  // 選択中の取引カードが変更された時に、フォームの収支データの内容を更新
   useEffect(() => {
     if (selectedTransaction) {
       setValue("type", selectedTransaction.type);
@@ -185,6 +179,46 @@ const TransactionForm = ({
     }
   }, [selectedTransaction]);
 
+  /** 保存・更新ボタン押下時（フォーム内容送信時）の処理 */
+  const onSubmit: SubmitHandler<Schema> = (data) => {
+    if (selectedTransaction) {
+      onUpdateTransaction(data, selectedTransaction.id)
+        .then(() => {
+          setSelectedTransaction(null);
+          if (isMobile) {
+            setIsDialogOpen(false);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      onSaveTransaction(data)
+        .then(() => {
+          if (isMobile) {
+            setIsDialogOpen(false);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+    reset({
+      type: "expense",
+      date: currentDay,
+      amount: 0,
+      category: "",
+      content: "",
+    });
+  };
+
+  /** 収支切り替えボタン押下時の処理 */
+  const incomeExpenseToggle = (type: IncomeExpense) => {
+    setValue("type", type);
+    setValue("category", "");
+  };
+
+  /** 削除ボタン押下時の処理 */
   const handleDelete = () => {
     if (selectedTransaction) {
       onDeleteTransaction(selectedTransaction.id);
@@ -196,6 +230,7 @@ const TransactionForm = ({
     }
   };
 
+  /** 収支入力フォーム本体 */
   const formContent = (
     <>
       {/* 入力エリアヘッダー */}
@@ -346,7 +381,7 @@ const TransactionForm = ({
   return (
     <>
       {isMobile ? (
-        // mobile
+        // モバイル用
         <Dialog
           open={isDialogOpen}
           onClose={onCloseForm}
@@ -356,7 +391,7 @@ const TransactionForm = ({
           <DialogContent>{formContent}</DialogContent>
         </Dialog>
       ) : (
-        // PC
+        // PC用
         <Box
           sx={{
             position: "fixed",

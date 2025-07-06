@@ -1,61 +1,34 @@
+import { FirebaseAuthErrorCode } from "../firebase";
 import {
-  createUserWithEmailAndPassword,
-  getAdditionalUserInfo,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  User,
-} from "firebase/auth";
-import React, { useState } from "react";
-import { auth, db, FirebaseAuthErrorCode, provider } from "../firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import {
-  AppBar,
   Box,
   Button,
-  ButtonGroup,
   Divider,
-  IconButton,
-  Link,
   Stack,
   TextField,
-  Toolbar,
   Typography,
 } from "@mui/material";
-import { NavLink, useNavigate } from "react-router-dom";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { Link, useNavigate } from "react-router-dom";
 import { useFlashMessage } from "../contexts/FlashMessageContext";
-import {
-  Controller,
-  SubmitErrorHandler,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
-import { Schema } from "zod";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { userSignInSchema, SignInSchema } from "../validations/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  getAuthErrorMessage,
-  userEmailSignIn,
-  userGoogleLogin,
-} from "../utils/auth";
+import { getAuthErrorMessage, userEmailSignIn } from "../utils/auth";
 import { FirebaseError } from "firebase/app";
-import { er } from "@fullcalendar/core/internal-common";
 import GoogleAuth from "../components/common/GoogleAuth";
 
+/******************************************************
+ * SignIn Component
+ *
+ * @description ログインページを表示するコンポーネント
+ ******************************************************/
 const SignIn = () => {
   const { showFlashMessage } = useFlashMessage();
   const navigate = useNavigate();
 
+  // ログインフォームの初期化とバリデーション設定
+  // - Zod スキーマ（SignInSchema）によるバリデーション
+  // - email/password の初期値を定義
+  // - フォーム操作用の関数（control, handleSubmit, reset など）を取得
   const {
     control,
     handleSubmit,
@@ -69,10 +42,10 @@ const SignIn = () => {
     resolver: zodResolver(userSignInSchema),
   });
 
+  /** ログインボタン押下時（フォーム内容送信時）の処理 */
   const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
     await userEmailSignIn(data)
       .then(() => {
-        console.log("メールアドレスでログインしました。");
         showFlashMessage("ログインしました", "success");
 
         // Homeページへ遷移
@@ -212,111 +185,10 @@ const SignIn = () => {
       <GoogleAuth />
 
       <Typography sx={{ mt: 4 }} fontWeight={"fontWeightMedium"}>
-        アカウントの新規登録は <Link href="/signup">こちら</Link>
+        アカウントの新規登録は <Link to="/signup">こちら</Link>
       </Typography>
     </Box>
   );
 };
 
 export default SignIn;
-
-// // ログインボタン
-// export const SignInButton = () => {
-//   const navigate = useNavigate();
-//   const { showFlashMessage } = useFlashMessage();
-
-//   await userGoogleLogin();
-
-//   // Googleログイン処理
-//   // const handleGoogleLogin = async (): Promise<void> => {
-//   //   try {
-//   //     // ① firebase Authenticationへ、Googleログイン
-//   //     const result = await signInWithPopup(auth, provider);
-//   //     const loggedInUser = result.user;
-
-//   //     console.log("ログイン成功", loggedInUser);
-
-//   //     // ② Firestore Databaseへユーザー情報を設定
-//   //     await handleUserData(loggedInUser);
-//   //     console.log("②まで完了", loggedInUser.uid);
-
-//   //     showFlashMessage("ログインに成功しました", "success");
-
-//   //     // ③ Homeページへ遷移
-//   //     navigate("/");
-//   //   } catch (error) {
-//   //     console.error("ログイン失敗", error);
-//   //     showFlashMessage("ログインに失敗しました", "error");
-//   //   } finally {
-//   //   }
-//   // };
-
-//   // ユーザー情報設定処理（新規/既存ユーザー判定）
-//   // const handleUserData = async (user: User): Promise<void> => {
-//   //   try {
-//   //     const userDocRef = doc(db, "users", user.uid);
-//   //     console.log("ログインしようとしているユーザーID", user.uid);
-
-//   //     const userDocSnap = await getDoc(userDocRef);
-
-//   //     if (userDocSnap.exists()) {
-//   //       console.log("ドキュメントあり");
-//   //       // 既存ユーザーの場合 ： ログイン時刻を更新
-//   //       console.log("既存ユーザー", user.uid);
-
-//   //       await updateDoc(userDocRef, {
-//   //         lastLoginAt: serverTimestamp(),
-//   //       });
-//   //       console.log("ログイン時刻を更新");
-//   //     } else {
-//   //       // 新規ユーザーの場合 ： ドキュメントを新規作成
-//   //       console.log("新規ユーザー", user.uid);
-
-//   //       const newUserData: UserData = {
-//   //         uid: user.uid,
-//   //         displayName: user.displayName,
-//   //         email: user.email,
-//   //         provider: "google",
-//   //         photoURL: user.photoURL,
-//   //         createAt: serverTimestamp(),
-//   //         lastLoginAt: serverTimestamp(),
-//   //       };
-//   //       await setDoc(userDocRef, newUserData);
-//   //       console.log("新規ユーザーのドキュメント追加");
-//   //     }
-//   //   } catch (error) {
-//   //     console.error("ユーザーデータ処理エラー", error);
-//   //   }
-//   // };
-
-//   return (
-//     <Button
-//       onClick={handleGoogleLogin}
-//       variant="outlined"
-//       sx={{
-//         width: { xs: "100%", lg: 750 },
-//         borderRadius: "50px", // 丸枠
-//         backgroundColor: "#f5f5f5", // グレー背景
-//         border: "1px solid #aaa", // 濃いグレー枠
-//         color: "black",
-//         textTransform: "none",
-//         mx: "auto",
-//         px: 2,
-//         py: 1,
-//         "&:hover": {
-//           backgroundColor: "#e0e0e0",
-//         },
-//       }}
-//     >
-//       <Typography
-//         component="img"
-//         src="/google_mark.png"
-//         alt="Google logo"
-//         sx={{
-//           width: 40,
-//           height: 40,
-//         }}
-//       ></Typography>
-//     </Button>
-//   );
-// };

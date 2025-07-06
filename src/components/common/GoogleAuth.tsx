@@ -1,23 +1,27 @@
 import { Button, Typography } from "@mui/material";
-import React from "react";
 import { getAuthErrorMessage, userGoogleLogin } from "../../utils/auth";
 import { useFlashMessage } from "../../contexts/FlashMessageContext";
 import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { FirebaseAuthErrorCode } from "../../firebase";
 
+/******************************************************
+ * GoogleAuth Component
+ *
+ * @description Google連携によるログイン処理を行うコンポーネント。
+ * Googleプロバイダー経由のログインボタンを表示する。
+ * Firebase Authenticationに対してGoogle認証でログインする。
+ ******************************************************/
 const GoogleAuth = () => {
   const { showFlashMessage } = useFlashMessage();
   const navigate = useNavigate();
 
+  /** Google認証処理 */
   const handleGoogleAuth = async () => {
     await userGoogleLogin()
       .then(() => {
-        console.log("Google認証でログインしました。");
         showFlashMessage("ログインしました", "success");
-
-        // Homeページへ遷移
-        navigate("/");
+        navigate("/"); // Homeページへ遷移
       })
       .catch((error) => {
         if (error instanceof FirebaseError) {
