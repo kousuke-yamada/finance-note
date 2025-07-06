@@ -1,4 +1,4 @@
-# finance-note
+# Finance-Note
 ### 汎用的な家計簿アプリ。シンプルなUIで、日々の出費を気軽に記録できる。
 - ゲストモード：お試し用。ページを訪れたユーザーが自由にUI操作し、アプリを体感できる。
 - メンバーモード：個人記録用。アカウント作成し、ログインすることで、自分専用の収支を記録できる。
@@ -17,3 +17,18 @@
 
 ---
 
+### 使用技術
+
+| カテゴリ | 技術 |
+|------|------|
+| フロントエンド | React 18.2.0 / Typescript  5.8.3   | 
+| バックエンド | なし   | 
+| データベース | FireStore Database   | 
+| 認証 | Firebase Authentication   |
+| ビルドツール | Vite   | 
+| CI/CD | Github Actions   | 
+| ホスティング | Vercil   | 
+| UIライブラリ | Material UI   |
+| 日付・カレンダー | FullCalendar / date-fns / DatePicker   |
+| グラフ描画 |  Chart.js   | 
+| バリデーション |  Zod   | 
