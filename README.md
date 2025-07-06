@@ -3,7 +3,9 @@
 - ゲストモード：お試し用。ページを訪れたユーザーが自由にUI操作し、アプリを体感できる。
 - メンバーモード：個人記録用。アカウント作成し、ログインすることで、自分専用の収支を記録できる。
   
-サービスURL: https://finance-note-base.vercel.app/
+サービスURL：https://finance-note-base.vercel.app/
+
+仕様書： [【仕様書】Finance_Note アプリ開発](https://docs.google.com/spreadsheets/d/1_tU3pyckgYj02N8q94A0vuPmPDS3GhBOqm8eTNHitaQ/edit?gid=0#gid=0)
 
 ---
 
