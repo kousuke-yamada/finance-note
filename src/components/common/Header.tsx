@@ -42,6 +42,7 @@ const Header = ({
       sx={{
         width: { md: `calc(100% - ${drawerWidth}px)` },
         ml: { md: `${drawerWidth}px` },
+        bgcolor: "#424242",
       }}
     >
       <Toolbar>
