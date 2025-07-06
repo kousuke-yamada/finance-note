@@ -29,7 +29,7 @@
 | 認証 | Firebase Authentication   |
 | ビルドツール | Vite   | 
 | CI/CD | Github Actions   | 
-| ホスティング | Vercil   | 
+| ホスティング | Vercel   | 
 | UIライブラリ | Material UI   |
 | 日付・カレンダー | FullCalendar / date-fns / DatePicker   |
 | グラフ描画 |  Chart.js   | 
