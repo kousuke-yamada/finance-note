@@ -109,8 +109,7 @@
    - 実際のセキュリティ制御はFirebase Security Rulesで実装
 
 ### Firestore Security Rules
-Firestore では Security Rules によるアクセス制御を実装しており、認証状態やユーザーIDに応じた適切な制限を設けている。  
-これにより、未認証ユーザーによる不正操作や、他ユーザーのデータへのアクセスを防止する。  
+Firestore では Security Rules によるアクセス制御を実装しており、認証状態やユーザーIDに応じた適切な制限を設けている。これにより、未認証ユーザーによる不正操作や、他ユーザーのデータへのアクセスを防止する。  
 本番環境では、以下のSecurity Rulesを設定する。
 ```javascript
 rules_version = '2';
