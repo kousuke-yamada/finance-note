@@ -21,7 +21,7 @@
 
 ---
 
-### 使用技術
+## 使用技術
 
 | カテゴリ | 技術 |
 |------|------|
@@ -36,3 +36,35 @@
 | 日付・カレンダー | FullCalendar / date-fns / DatePicker   |
 | グラフ描画 |  Chart.js   | 
 | バリデーション |  Zod   | 
+  
+---
+
+## セキュリティ設定
+### Firebase設定値の管理
+以下の理由により、Firebase設定値（apiKey等）はハードコーディングとしている。
+1. **Firebase設計の特性**
+   - これらの値はGoogleの設計上、クライアントサイドで公開されることが前提
+   - apiKeyは認証キーではなく、プロジェクト識別子としての役割
+2. **ポートフォリオ用途での利便性**
+   - 閲覧者が`git clone`後、環境変数設定なしで即座に動作確認可能
+   - デモアプリとしてのaccessibilityを優先
+3. **セキュリティ制御の実装場所**
+   - 実際のセキュリティ制御はFirebase Security Rulesで実装
+
+### Firestore Security Rules
+本番環境では、以下のSecurity Rulesを設定する。
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      // 通常ユーザー：認証済みで自分のデータのみ
+      // ゲストユーザー：userIdが"guest"の場合のみ未認証でも許可
+      allow read, write: if (request.auth != null && request.auth.uid == userId) || (userId == "guest");
+      
+      match /Transactions/{transactionId} {
+        allow read, write: if (request.auth != null && request.auth.uid == userId) || (userId == "guest");
+      }
+    }
+  }
+}
