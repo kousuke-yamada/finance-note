@@ -105,10 +105,12 @@
 2. **ポートフォリオ用途での利便性**
    - 閲覧者が`git clone`後、環境変数設定なしで即座に動作確認可能
    - デモアプリとしてのaccessibilityを優先
-3. **セキュリティ制御の実装場所**
+3. **セキュリティ制御の実装**
    - 実際のセキュリティ制御はFirebase Security Rulesで実装
 
 ### Firestore Security Rules
+Firestore では Security Rules によるアクセス制御を実装しており、認証状態やユーザーIDに応じた適切な制限を設けている。  
+これにより、未認証ユーザーによる不正操作や、他ユーザーのデータへのアクセスを防止する。  
 本番環境では、以下のSecurity Rulesを設定する。
 ```javascript
 rules_version = '2';
